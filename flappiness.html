@@ -17,28 +17,6 @@
 			}
 		</style>
 	</head>
-	<script type="x-shader/x-vertex" id="vertexshader">
-		attribute float size;
-		attribute vec3 customColor;
-		varying vec3 vColor;
-		varying float zdist;
-		void main() {
-			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-			zdist =  1.1;
-			vColor = customColor * vec3( zdist , zdist , zdist );
-			gl_PointSize = size * ( 400.0 / -mvPosition.z );
-			gl_Position = projectionMatrix * mvPosition;
-		}
-	</script>
-	<script type="x-shader/x-fragment" id="fragmentshader">
-		uniform vec3 color;
-		uniform sampler2D tex;
-		varying vec3 vColor;
-		void main() {
-			gl_FragColor = vec4( color * vColor, 1.0 );
-			gl_FragColor = gl_FragColor * texture2D( tex, gl_PointCoord );
-		}
-	</script>
 	<body>
         <div id='points' style='position:absolute;font-size: large;left:0px;width:3rem;'>0</div>
         <div id='lastPoints' style='position:absolute;font-size: large;right:0px;width:3rem;'>0</div>
