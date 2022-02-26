@@ -17,28 +17,6 @@
 			}
 		</style>
 	</head>
-	<script type="x-shader/x-vertex" id="vertexshader">
-		attribute float size;
-		attribute vec3 customColor;
-		varying vec3 vColor;
-		varying float zdist;
-		void main() {
-			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-			zdist =  1.1;
-			vColor = customColor * vec3( zdist , zdist , zdist );
-			gl_PointSize = size * ( 400.0 / -mvPosition.z );
-			gl_Position = projectionMatrix * mvPosition;
-		}
-	</script>
-	<script type="x-shader/x-fragment" id="fragmentshader">
-		uniform vec3 color;
-		uniform sampler2D tex;
-		varying vec3 vColor;
-		void main() {
-			gl_FragColor = vec4( color * vColor, 1.0 );
-			gl_FragColor = gl_FragColor * texture2D( tex, gl_PointCoord );
-		}
-	</script>
 	<body>
         <div id='aim'  style='background:rgb(100,200,100);position:absolute;width:5rem;height:5rem;left:0px;'>AIM</div>
         <div id='fire' style='background:rgb(100,100,200);position:absolute;width:5rem;height:5rem;right:0px;'>FIRE</div>
@@ -47,4 +25,4 @@
 		
 		<script src="ARTanks.js"></script>
 	</body>
-</html>
+</html> 
