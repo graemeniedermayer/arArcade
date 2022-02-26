@@ -21,7 +21,7 @@ function getXRSessionInit( mode, options) {
 	}
 	return newInit;
 }
-function init(postFunc) {
+function init() {
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.001, 10 );
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -30,7 +30,6 @@ function init(postFunc) {
 	renderer.xr.enabled = true;
 	document.body.appendChild( renderer.domElement );
 	window.addEventListener( 'resize', onWindowResize, false );
-	postFunc()
 }
 function AR(){
 	var currentSession = null;
@@ -82,18 +81,18 @@ let speed = 1
 // Does
 let pixRatio = window.devicePixelRatio;
 let cellphoneObj = new THREE.BoxGeometry( 
-    screen.width * 0.0254/(40*pixRatio),  
-    screen.height * 0.0254/(40*pixRatio), 0.01, 1, 1, 1)
+    pixRatio * screen.width * 0.0254/96,  
+    pixRatio * screen.height * 0.0254/96, 0.01, 1, 1, 1)
 let cellphoneMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-cellphoneMaterial.visible = false
-let cellphoneMesh = new THREE.Mesh( cellphoneObj, cellphoneMaterial );
+let cellphoneMaterial.visible = false
+let cellphoneMesh = new THREE.Mesh( cellphoneGeometry, cellphoneMaterial );
 // This is a bad form of collision detections
 
 let addBox = ()=>{
-    let boxGeometry = new THREE.BoxGeometry( .3, .3, .1, 1,1,1 );
-    let boxMaterial = new THREE.MeshBasicMaterial( { color: 0xaa4444 } );
+    let boxGeometry = new THREE.BoxGeometry( .3, .3, .3, 1,1,1 );
+    let boxMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
     let boxMesh = new THREE.Mesh( boxGeometry, boxMaterial );
-    boxMesh.position.set(4*(Math.random()-0.5), 1.5*Math.random()-0.5, -4) 
+    boxMesh.position( new THREE.Vector3(4*(Math.random()-0.5), Math.random()+0.5, -2) )
     return boxMesh
 }
 let clearScene = ()=>{
@@ -101,61 +100,46 @@ let clearScene = ()=>{
 	     obj = scene.children[i];
 	     scene.remove(obj); 
 	}
-    for( var i = boxs.children.length - 1; i >= 0; i--) { 
-	     obj = boxs.children[i];
-	     boxs.remove(obj); 
-	}
 }
 let initScene = ()=>{
-    for(let i=0; i<10; i++){
+    for(let i; i<10; i++){
         let boxMesh = addBox()
         boxs.add( boxMesh );
     }
     scene.add( boxs );
 }
 let collisionDetect = (obj)=>{
-    const position = obj.geometry.attributes.position;
-	let originPoint = obj.position.clone();
-    let localVertex = new THREE.Vector3();
-    for (var vertexIndex = 0; vertexIndex < position.count; vertexIndex++){		
-		localVertex.fromBufferAttribute( position, vertexIndex );
+    for (var vertexIndex = 0; vertexIndex < obj.geometry.vertices.length; vertexIndex++){		
+		var localVertex = obj.geometry.vertices[vertexIndex].clone();
 		var globalVertex = localVertex.applyMatrix4( obj.matrix );
 		var directionVector = globalVertex.sub( obj.position );
+		
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-		var collisionResults = ray.intersectObjects( boxs.children );
+		var collisionResults = ray.intersectObjects( boxs );
 		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
             // check the collision
             clearScene()
             lastPoints = points
             points = 0
-			document.getElementById('points').innerHTML = points
-			document.getElementById('lastPoints').innerHTML = lastPoints
             initScene()
-			break
         } 
 	}	
 }
 let gameLoop = ()=>{
-    for(let object of boxs.children){
+    for(let object of activeObjects){
         // check for valid if valid move forward else delete
         let z = object.position.z
-        if(z>1){
+        if(z>2){
             // remove object (add new object)
-			boxs.remove(object)
             let boxMesh = addBox()
-            speed *= 1.001
+            speed *= 1.005
             points+=1
-			document.getElementById('points').innerHTML = points
             boxs.add( boxMesh );
         }else{
-            object.position.z += 0.01 * speed
+            object.position.z += 0.02 * speed
         }
     }
-	cellphoneMesh.position.set( ...(camera.position.toArray()) )
-	cellphoneMesh.quaternion.set( ...(camera.quaternion.toArray()) )
-	if(cellphoneMesh){
-    	collisionDetect(cellphoneMesh)
-	}
+    collisionDetect(cellphoneBox)
 }
 
 function onWindowResize() {
@@ -175,12 +159,11 @@ let postFunc = ()=>{
     initScene()
 }
 init(postFunc);
+animate();
 var button = document.createElement( 'button' );
 button.id = 'ArButton'
 button.textContent = 'ENTER AR' ;
 button.style.cssText+= `position: absolute;top:80%;left:40%;width:20%;height:3rem;`;
 document.body.appendChild(button)
-document.getElementById('ArButton').addEventListener('click',x=>{
-	AR()
-	animate();
-})
+document.getElementById('ArButton').addEventListener('click',x=>AR())
+
