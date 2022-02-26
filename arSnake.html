@@ -17,32 +17,14 @@
 			}
 		</style>
 	</head>
-	<script type="x-shader/x-vertex" id="vertexshader">
-		attribute float size;
-		attribute vec3 customColor;
-		varying vec3 vColor;
-		varying float zdist;
-		void main() {
-			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-			zdist =  1.1;
-			vColor = customColor * vec3( zdist , zdist , zdist );
-			gl_PointSize = size * ( 400.0 / -mvPosition.z );
-			gl_Position = projectionMatrix * mvPosition;
-		}
-	</script>
-	<script type="x-shader/x-fragment" id="fragmentshader">
-		uniform vec3 color;
-		uniform sampler2D tex;
-		varying vec3 vColor;
-		void main() {
-			gl_FragColor = vec4( color * vColor, 1.0 );
-			gl_FragColor = gl_FragColor * texture2D( tex, gl_PointCoord );
-		}
-	</script>
 	<body>
-        <div id='score' style='position:absolute;font-size: large;left:0px;width:5rem'>0</div>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        
+		<!-- <img id='vine' style='display:none;' src = 'snakeTexture.png'> -->
+        <div id='score' style='position:absolute;font-size: large;left:0px;width:5rem;user-select: none;'>0</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.min.js"></script>
+		<!-- <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script> -->
 		
+		<script src="THREE.MeshLineV.js"></script>
 		<script src="ARSnake.js"></script>
 	</body>
-</html>
+</html> 
