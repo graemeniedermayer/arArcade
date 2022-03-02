@@ -171,7 +171,7 @@ let collisionDetect = (obj)=>{
             }else if(type=='walls'){
                 // vertex re
 				
-                wallBounce( directionVector.x > directionVector.y ? 'x' : 'y')
+                wallBounce( Math.abs(directionVector.x) > Math.abs(directionVector.y) ? 'x' : 'y')
 				break
             }
 			
